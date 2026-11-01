@@ -1,0 +1,98 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="防災課題・意見の入力">
+  <h1>防災課題・意見収集フォーム</h1>
+  <p class="sub-text">以下の項目にご協力をお願いいたします。（所要時間：約3〜5分）</p>
+
+  <form id="feedback-form" action="https://script.google.com/macros/s/YOUR_GAS_ENDPOINT_URL/exec" method="POST" class="card">
+    
+    <div class="form-group">
+      <label for="category">1. ご意見のカテゴリ（必須）</label>
+      <select id="category" name="category" required>
+        <option value="">選択してください</option>
+        <option value="地域のリスク・危険箇所">地域のリスク・危険箇所について</option>
+        <option value="避難場所・避難経路">避難場所・避難経路について</option>
+        <option value="情報の取得方法">防災情報の受け取り方について</option>
+        <option value="試作品への改善要望">ANIMOS試作品への感想・改善要望</option>
+        <option value="地域・学校の防災活動">地域や学校での取り組みについて</option>
+        <option value="その他">その他</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="info_source">2. 防災情報を普段どこから得ていますか？（複数選択可）</label>
+      <div class="checkbox-group">
+        <label><input type="checkbox" name="info_source" value="自治体広報・防災行政無線"> 自治体広報・防災行政無線</label>
+        <label><input type="checkbox" name="info_source" value="テレビ・ラジオ"> テレビ・ラジオ</label>
+        <label><input type="checkbox" name="info_source" value="近所・地域コミュニティ"> 近所・地域コミュニティ</label>
+        <label><input type="checkbox" name="info_source" value="インターネット検索"> インターネット検索</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="detail">3. 具体的な課題・困りごと・改善案（必須）</label>
+      <p class="help-text">※個人を特定できる情報（お名前、電話番号、詳しい番地等）は書き込まないでください。</p>
+      <textarea id="detail" name="detail" rows="6" placeholder="（例）〇〇地区の避難路は夜間街灯が少なく危険と感じる。試作品アプリには〇〇機能を追加してほしい、など" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="age_group">4. 年代（任意）</label>
+      <select id="age_group" name="age_group">
+        <option value="未回答">選択しない</option>
+        <option value="10代以下">10代以下</option>
+        <option value="20代〜30代">20代〜30代</option>
+        <option value="40代〜50代">40代〜50代</option>
+        <option value="60代以上">60代以上</option>
+      </select>
+    </div>
+
+    <div class="form-group privacy-check">
+      <label>
+        <input type="checkbox" id="agree" required />
+        <a href="/" target="_blank">利用目的および個人情報の取り扱い</a>に同意する
+      </label>
+    </div>
+
+    <button type="submit" class="btn-primary" id="submit-btn">送信する</button>
+  </form>
+
+  <script>
+    // フォーム送信時の非同期処理（GASへの送信と画面遷移）
+    const form = document.getElementById('feedback-form') as HTMLFormElement;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitBtn.textContent = '送信中...';
+
+      const formData = new FormData(form);
+      const data: Record<string, any> = {};
+      
+      formData.forEach((value, key) => {
+        if (data[key]) {
+          if (!Array.isArray(data[key])) data[key] = [data[key]];
+          data[key].push(value);
+        } else {
+          data[key] = value;
+        }
+      });
+
+      try {
+        await fetch(form.action, {
+          method: 'POST',
+          mode: 'no-cors', // GAS送信特有のクロスドメイン対応
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        window.location.href = '/thanks';
+      } catch (err) {
+        alert('送信に失敗しました。時間をおいて再度お試しください。');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '送信する';
+      }
+    });
+  </script>
+</Layout>
