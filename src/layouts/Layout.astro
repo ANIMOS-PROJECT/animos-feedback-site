@@ -1,9 +1,12 @@
 ---
+import '../styles/global.css';
+
 interface Props {
   title: string;
 }
 
 const { title } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <!DOCTYPE html>
@@ -12,16 +15,16 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} | ANIMOS PROJECT 防災意見収集サイト</title>
-    <link rel="stylesheet" href="/src/styles/global.css" />
+    <link rel="icon" type="image/svg+xml" href={`${baseUrl}/favicon.svg`} />
   </head>
   <body>
     <header class="site-header">
       <div class="container">
-        <a href="/" class="logo">ANIMOS PROJECT <span>防災意見収集モデル</span></a>
+        <a href={`${baseUrl}/`} class="logo">ANIMOS PROJECT <span>防災意見収集モデル</span></a>
         <nav class="nav">
-          <a href="/">趣旨説明</a>
-          <a href="/form" class="btn-nav">意見を入力する</a>
-          <a href="/contact">お問い合わせ</a>
+          <a href={`${baseUrl}/`}>趣旨説明</a>
+          <a href={`${baseUrl}/form`} class="btn-nav">意見を入力する</a>
+          <a href={`${baseUrl}/contact`}>お問い合わせ</a>
         </nav>
       </div>
     </header>
